@@ -173,3 +173,5 @@ setInterval(checkReminders, 60 * 1000);
 loadGlobalReminder();
 
 // ... 其余代码保持不变 ...
+window.addTodo = addTodo;
+window.saveGlobalReminder = saveGlobalReminder;
