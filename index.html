@@ -9,6 +9,13 @@
 <body>
     <div class="container">
         <h1>项目管理待办清单</h1>
+        <form id="globalReminderForm" class="reminder-form" onsubmit="saveGlobalReminder(event)">
+            <strong>全局提醒设置：</strong>
+            <label>每天提醒时间：<input type="time" id="global-remind-time" required></label>
+            <label>每天提醒次数：<input type="number" id="global-remind-count" min="1" max="10" value="1" required></label>
+            <label>提前提醒天数：<input type="number" id="global-remind-days" min="0" max="30" value="1" required></label>
+            <button type="submit">保存全局提醒</button>
+        </form>
         <form id="todoForm" class="todo-form" onsubmit="addTodo(event)">
             <input type="text" id="description" placeholder="待办描述" required>
             <input type="date" id="dueDate" required>
@@ -17,9 +24,10 @@
             <label for="progress">进度：</label>
             <input type="range" id="progress" min="0" max="100" value="0" step="1" oninput="progressValue.value = progress.value">
             <output id="progressValue">0</output>%
+            <label>自定义提醒时间：<input type="time" id="remindTime"></label>
+            <label>提前提醒天数：<input type="number" id="remindDays" min="0" max="30" value=""></label>
             <button type="submit">添加任务</button>
         </form>
-
         <table class="todo-table">
             <thead>
                 <tr>
@@ -29,6 +37,7 @@
                     <th>干系人</th>
                     <th>备注</th>
                     <th>进度</th>
+                    <th>提醒设置</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -39,4 +48,4 @@
     </div>
     <script src="script.js"></script>
 </body>
-</html> 
+</html>
