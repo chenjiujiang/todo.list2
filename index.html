@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目管理待办清单</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>项目管理待办清单</h1>
+        <form id="todoForm" class="todo-form" onsubmit="addTodo(event)">
+            <input type="text" id="description" placeholder="待办描述" required>
+            <input type="date" id="dueDate" required>
+            <input type="text" id="stakeholder" placeholder="干系人" required>
+            <input type="text" id="note" placeholder="备注">
+            <label for="progress">进度：</label>
+            <input type="range" id="progress" min="0" max="100" value="0" step="1" oninput="progressValue.value = progress.value">
+            <output id="progressValue">0</output>%
+            <button type="submit">添加任务</button>
+        </form>
+
+        <table class="todo-table">
+            <thead>
+                <tr>
+                    <th>描述</th>
+                    <th>预计结束日期</th>
+                    <th>剩余天数</th>
+                    <th>干系人</th>
+                    <th>备注</th>
+                    <th>进度</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="todoTableBody">
+                <!-- 任务将通过 JavaScript 动态添加 -->
+            </tbody>
+        </table>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 
