@@ -294,14 +294,7 @@ function calcRemainDaysNum(dueDate) {
 }
 
 function sendReminder(msg) {
-    // 播放闹钟铃声
-    try {
-        const audio = document.getElementById('alarm-audio');
-        if (audio) {
-            audio.currentTime = 0;
-            audio.play();
-        }
-    } catch (e) {}
+    // 已去除闹钟铃声播放
     if ('Notification' in window && Notification.permission === 'granted') {
         new Notification(msg);
     } else {
