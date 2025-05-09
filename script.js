@@ -65,12 +65,11 @@ function renderTodos() {
     todoTableBody.innerHTML = '';
     todos.forEach((todo, idx) => {
         const tr = document.createElement('tr');
-
         if (editingIdx === idx) {
-            // 编辑模式
+            // 编辑模式，变量插值+日期格式化
             tr.innerHTML = `
                 <td><input type="text" value="${todo.description}" id="edit-desc-${idx}" style="width:95%"></td>
-                <td><input type="date" value="${todo.dueDate}" id="edit-due-${idx}"></td>
+                <td><input type="date" value="${formatDateForInput(todo.dueDate)}" id="edit-due-${idx}"></td>
                 <td>${calcRemainDays(todo.dueDate)}</td>
                 <td><input type="text" value="${todo.stakeholder}" id="edit-stake-${idx}" style="width:90%"></td>
                 <td><input type="text" value="${todo.note}" id="edit-note-${idx}" style="width:90%"></td>
@@ -85,32 +84,26 @@ function renderTodos() {
             `;
         } else {
             // 普通显示模式
-            // 描述
             const tdDesc = document.createElement('td');
             tdDesc.textContent = todo.description;
             tr.appendChild(tdDesc);
 
-            // 预计结束日期
             const tdDue = document.createElement('td');
             tdDue.textContent = todo.dueDate;
             tr.appendChild(tdDue);
 
-            // 剩余天数
             const tdRemain = document.createElement('td');
             tdRemain.textContent = calcRemainDays(todo.dueDate);
             tr.appendChild(tdRemain);
 
-            // 干系人
             const tdStake = document.createElement('td');
             tdStake.textContent = todo.stakeholder;
             tr.appendChild(tdStake);
 
-            // 备注
             const tdNote = document.createElement('td');
             tdNote.textContent = todo.note;
             tr.appendChild(tdNote);
 
-            // 进度
             const tdProgress = document.createElement('td');
             const bar = document.createElement('div');
             bar.className = 'progress-bar';
@@ -310,4 +303,13 @@ loadGlobalReminder();
 
 // 在文件末尾挂载全局函数
 window.addTodo = addTodo;
-window.saveGlobalReminder = saveGlobalReminder; 
+window.saveGlobalReminder = saveGlobalReminder;
+
+function formatDateForInput(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d)) return '';
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const day = d.getDate().toString().padStart(2, '0');
+    return `${d.getFullYear()}-${month}-${day}`;
+} 
