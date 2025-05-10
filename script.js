@@ -64,18 +64,31 @@ function saveGlobalReminder(e) {
 function renderTodos() {
     todoTableBody.innerHTML = '';
     todos.forEach((todo, idx) => {
+        if (todo.status === '已完成') return; // 主页面不显示已完成
         const tr = document.createElement('tr');
         if (editingIdx === idx) {
-            // 编辑模式，变量插值+日期格式化
+            // 编辑模式
             tr.innerHTML = `
                 <td><input type="text" value="${todo.description}" id="edit-desc-${idx}" style="width:95%"></td>
                 <td><input type="date" value="${formatDateForInput(todo.dueDate)}" id="edit-due-${idx}"></td>
                 <td>${calcRemainDays(todo.dueDate)}</td>
                 <td><input type="text" value="${todo.stakeholder}" id="edit-stake-${idx}" style="width:90%"></td>
-                <td><input type="text" value="${todo.note}" id="edit-note-${idx}" style="width:90%"></td>
+                <td><textarea id="edit-note-${idx}" style="width:90%;resize:vertical;">${todo.note}</textarea></td>
                 <td>
-                    <input type="range" min="0" max="100" value="${todo.progress}" id="edit-progress-${idx}" oninput="document.getElementById('edit-progress-label-${idx}').textContent=this.value+'%'">
-                    <span id="edit-progress-label-${idx}">${todo.progress}%</span>
+                    <select id="edit-status-${idx}">
+                        <option value="未开始" ${todo.status === '未开始' ? 'selected' : ''}>未开始</option>
+                        <option value="进行中" ${todo.status === '进行中' ? 'selected' : ''}>进行中</option>
+                        <option value="已完成" ${todo.status === '已完成' ? 'selected' : ''}>已完成</option>
+                        <option value="延期" ${todo.status === '延期' ? 'selected' : ''}>延期</option>
+                        <option value="跨周期" ${todo.status === '跨周期' ? 'selected' : ''}>跨周期</option>
+                    </select>
+                </td>
+                <td>
+                    ${(todo.remindTime ? `时间:${todo.remindTime}<br>` : '') + (todo.remindDays !== null && todo.remindDays !== undefined ? `提前:${todo.remindDays}天` : '')}
+                </td>
+                <td>
+                    <input type="file" id="edit-image-${idx}" accept="image/*">
+                    ${todo.image ? `<img src="${todo.image}" style="max-width:100px;max-height:100px;">` : ''}
                 </td>
                 <td>
                     <button class="action-btn" onclick="saveEdit(${idx})">保存</button>
@@ -101,31 +114,29 @@ function renderTodos() {
             tr.appendChild(tdStake);
 
             const tdNote = document.createElement('td');
-            tdNote.textContent = todo.note;
+            tdNote.innerHTML = todo.note.replace(/\n/g, '<br>');
             tr.appendChild(tdNote);
 
-            const tdProgress = document.createElement('td');
-            const bar = document.createElement('div');
-            bar.className = 'progress-bar';
-            const barInner = document.createElement('div');
-            barInner.className = 'progress-bar-inner';
-            barInner.style.width = todo.progress + '%';
-            bar.appendChild(barInner);
-            const label = document.createElement('span');
-            label.className = 'progress-label';
-            label.textContent = todo.progress + '%';
-            tdProgress.appendChild(bar);
-            tdProgress.appendChild(label);
-            tr.appendChild(tdProgress);
+            const tdStatus = document.createElement('td');
+            tdStatus.textContent = todo.status;
+            tr.appendChild(tdStatus);
 
-            // 提醒设置
             const tdRemind = document.createElement('td');
             tdRemind.innerHTML =
                 (todo.remindTime ? `时间:${todo.remindTime}<br>` : '') +
                 (todo.remindDays !== null && todo.remindDays !== undefined ? `提前:${todo.remindDays}天` : '');
             tr.appendChild(tdRemind);
 
-            // 操作
+            const tdImage = document.createElement('td');
+            if (todo.image) {
+                const img = document.createElement('img');
+                img.src = todo.image;
+                img.style.maxWidth = '100px';
+                img.style.maxHeight = '100px';
+                tdImage.appendChild(img);
+            }
+            tr.appendChild(tdImage);
+
             const tdAction = document.createElement('td');
             const editBtn = document.createElement('button');
             editBtn.className = 'action-btn';
@@ -156,23 +167,50 @@ function calcRemainDays(dueDate) {
 // 添加任务
 function addTodo(e) {
     e.preventDefault();
-    const todo = {
-        description: descriptionInput.value.trim(),
-        dueDate: dueDateInput.value,
-        stakeholder: stakeholderInput.value.trim(),
-        note: noteInput.value.trim(),
-        progress: parseInt(progressInput.value, 10),
-        createdAt: new Date().toISOString(),
-        remindTime: document.getElementById('remindTime').value || '',
-        remindDays: document.getElementById('remindDays').value !== '' ? parseInt(document.getElementById('remindDays').value, 10) : null,
-        reminded: false, // 标记是否已提醒
-        overdueReminded: false // 标记是否已过期提醒
-    };
-    todos.push(todo);
-    saveTodos();
-    renderTodos();
-    todoForm.reset();
-    progressValue.value = 0;
+    const imageFile = document.getElementById('image').files[0];
+    let imageBase64 = null;
+    if (imageFile) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            imageBase64 = event.target.result;
+            const todo = {
+                description: descriptionInput.value.trim(),
+                dueDate: dueDateInput.value,
+                stakeholder: stakeholderInput.value.trim(),
+                note: noteInput.value.trim(),
+                status: document.getElementById('status').value,
+                createdAt: new Date().toISOString(),
+                remindTime: document.getElementById('remindTime').value || '',
+                remindDays: document.getElementById('remindDays').value !== '' ? parseInt(document.getElementById('remindDays').value, 10) : null,
+                reminded: false,
+                overdueReminded: false,
+                image: imageBase64
+            };
+            todos.push(todo);
+            saveTodos();
+            renderTodos();
+            todoForm.reset();
+        };
+        reader.readAsDataURL(imageFile);
+    } else {
+        const todo = {
+            description: descriptionInput.value.trim(),
+            dueDate: dueDateInput.value,
+            stakeholder: stakeholderInput.value.trim(),
+            note: noteInput.value.trim(),
+            status: document.getElementById('status').value,
+            createdAt: new Date().toISOString(),
+            remindTime: document.getElementById('remindTime').value || '',
+            remindDays: document.getElementById('remindDays').value !== '' ? parseInt(document.getElementById('remindDays').value, 10) : null,
+            reminded: false,
+            overdueReminded: false,
+            image: null
+        };
+        todos.push(todo);
+        saveTodos();
+        renderTodos();
+        todoForm.reset();
+    }
 }
 
 // 删除任务
@@ -210,18 +248,40 @@ function saveEdit(idx) {
     const due = document.getElementById(`edit-due-${idx}`).value;
     const stake = document.getElementById(`edit-stake-${idx}`).value.trim();
     const note = document.getElementById(`edit-note-${idx}`).value.trim();
-    const progress = parseInt(document.getElementById(`edit-progress-${idx}`).value, 10);
-    todos[idx] = {
-        ...todos[idx],
-        description: desc,
-        dueDate: due,
-        stakeholder: stake,
-        note: note,
-        progress: progress
-    };
-    saveTodos();
-    editingIdx = null;
-    renderTodos();
+    const status = document.getElementById(`edit-status-${idx}`).value;
+    const imageFile = document.getElementById(`edit-image-${idx}`).files[0];
+    let imageBase64 = todos[idx].image;
+    if (imageFile) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            imageBase64 = event.target.result;
+            todos[idx] = {
+                ...todos[idx],
+                description: desc,
+                dueDate: due,
+                stakeholder: stake,
+                note: note,
+                status: status,
+                image: imageBase64
+            };
+            saveTodos();
+            editingIdx = null;
+            renderTodos();
+        };
+        reader.readAsDataURL(imageFile);
+    } else {
+        todos[idx] = {
+            ...todos[idx],
+            description: desc,
+            dueDate: due,
+            stakeholder: stake,
+            note: note,
+            status: status
+        };
+        saveTodos();
+        editingIdx = null;
+        renderTodos();
+    }
 }
 
 // 通知权限
