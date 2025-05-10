@@ -20,15 +20,25 @@
             <input type="text" id="description" placeholder="待办描述" required>
             <input type="date" id="dueDate" required>
             <input type="text" id="stakeholder" placeholder="干系人" required>
-            <input type="text" id="note" placeholder="备注">
-            <label for="progress">进度：</label>
-            <input type="range" id="progress" min="0" max="100" value="0" step="1" oninput="progressValue.value = progress.value">
-            <output id="progressValue">0</output>%
+            <textarea id="note" placeholder="备注" rows="3" style="width:100%;resize:vertical;"></textarea>
+            <label>上传图片：<input type="file" id="image" accept="image/*"></label>
+            <label>状态：
+                <select id="status" required>
+                    <option value="未开始">未开始</option>
+                    <option value="进行中">进行中</option>
+                    <option value="已完成">已完成</option>
+                    <option value="延期">延期</option>
+                    <option value="跨周期">跨周期</option>
+                </select>
+            </label>
             <label>自定义提醒时间：<input type="time" id="remindTime"></label>
             <label>提前提醒天数：<input type="number" id="remindDays" min="0" max="30" value=""></label>
             <button type="submit">添加任务</button>
         </form>
-        <table class="todo-table">
+        <div style="text-align:right;margin-bottom:1.5rem;">
+            <a href="completed.html" class="action-btn" style="background:#0071e3;color:#fff;">查看已完成任务</a>
+        </div>
+        <table class="todo-table" style="text-align:left;">
             <thead>
                 <tr>
                     <th>描述</th>
@@ -36,7 +46,7 @@
                     <th>剩余天数</th>
                     <th>干系人</th>
                     <th>备注</th>
-                    <th>进度</th>
+                    <th>状态</th>
                     <th>提醒设置</th>
                     <th>操作</th>
                 </tr>
