@@ -3,58 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>项目管理待办清单</title>
+    <title>项目管理甘特图</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>项目管理待办清单</h1>
-        <form id="globalReminderForm" class="reminder-form" onsubmit="saveGlobalReminder(event)">
-            <strong>全局提醒设置：</strong>
-            <label>每天提醒时间：<input type="time" id="global-remind-time" required></label>
-            <label>每天提醒次数：<input type="number" id="global-remind-count" min="1" max="10" value="1" required></label>
-            <label>提前提醒天数：<input type="number" id="global-remind-days" min="0" max="30" value="1" required></label>
-            <button type="submit">保存全局提醒</button>
-        </form>
-        <form id="todoForm" class="todo-form" onsubmit="addTodo(event)">
-            <input type="text" id="description" placeholder="待办描述" required>
-            <input type="date" id="dueDate" required>
-            <input type="text" id="stakeholder" placeholder="干系人" required>
-            <textarea id="note" placeholder="备注" rows="3" style="width:100%;resize:vertical;"></textarea>
-            <label>上传图片：<input type="file" id="image" accept="image/*"></label>
-            <label>状态：
-                <select id="status" required>
-                    <option value="未开始">未开始</option>
-                    <option value="进行中">进行中</option>
-                    <option value="已完成">已完成</option>
-                    <option value="延期">延期</option>
-                    <option value="跨周期">跨周期</option>
-                </select>
-            </label>
-            <label>自定义提醒时间：<input type="time" id="remindTime"></label>
-            <label>提前提醒天数：<input type="number" id="remindDays" min="0" max="30" value=""></label>
-            <button type="submit">添加任务</button>
-        </form>
-        <div style="text-align:right;margin-bottom:1.5rem;">
-            <a href="completed.html" class="action-btn" style="background:#0071e3;color:#fff;">查看已完成任务</a>
+    <div class="container gantt-layout">
+        <div class="sidebar">
+            <h2>项目阶段</h2>
+            <div id="stageTree">
+                <!-- 阶段和任务树由JS渲染 -->
+            </div>
+            <form id="globalReminderForm" class="reminder-form" onsubmit="saveGlobalReminder(event)">
+                <strong>全局提醒设置：</strong>
+                <label>每天提醒时间：<input type="time" id="global-remind-time" required></label>
+                <label>每天提醒次数：<input type="number" id="global-remind-count" min="1" max="10" value="1" required></label>
+                <label>提前提醒天数：<input type="number" id="global-remind-days" min="0" max="30" value="1" required></label>
+                <button type="submit">保存全局提醒</button>
+            </form>
+            <form id="taskForm" class="todo-form" onsubmit="addTask(event)">
+                <input type="text" id="description" placeholder="任务描述" required>
+                <input type="date" id="startDate" required>
+                <input type="date" id="endDate" required>
+                <input type="text" id="stakeholder" placeholder="干系人" required>
+                <textarea id="note" placeholder="备注" rows="3" style="width:100%;resize:vertical;"></textarea>
+                <label>上传图片：<input type="file" id="image" accept="image/*"></label>
+                <label>状态：
+                    <select id="status" required>
+                        <option value="未开始">未开始</option>
+                        <option value="进行中">进行中</option>
+                        <option value="已完成">已完成</option>
+                        <option value="延期">延期</option>
+                        <option value="跨周期">跨周期</option>
+                    </select>
+                </label>
+                <label>所属阶段：<input type="text" id="stage" placeholder="如：需求阶段" required></label>
+                <label>自定义提醒时间：<input type="time" id="remindTime"></label>
+                <label>提前提醒天数：<input type="number" id="remindDays" min="0" max="30" value=""></label>
+                <button type="submit">添加任务</button>
+            </form>
         </div>
-        <table class="todo-table" style="text-align:left;">
-            <thead>
-                <tr>
-                    <th>描述</th>
-                    <th>预计结束日期</th>
-                    <th>剩余天数</th>
-                    <th>干系人</th>
-                    <th>备注</th>
-                    <th>状态</th>
-                    <th>提醒设置</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-            <tbody id="todoTableBody">
-                <!-- 任务将通过 JavaScript 动态添加 -->
-            </tbody>
-        </table>
+        <div class="gantt-main">
+            <div class="gantt-header" id="ganttHeader">
+                <!-- 时间轴由JS渲染 -->
+            </div>
+            <div class="gantt-chart" id="ganttChart">
+                <!-- 甘特条由JS渲染 -->
+            </div>
+        </div>
     </div>
     <!-- <audio id="alarm-audio" src="https://cdn.pixabay.com/audio/2022/07/26/audio_124bfa1c82.mp3" preload="auto"></audio> -->
     <script src="script.js"></script>
